@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <title>Fake News Detector</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <script src="../static/js/predict.js" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+</head>
+<body>
+    <header>
+        <!-- <div class="container"> -->
+            <span id="main-head">Fake News Detector</span>
+                <!-- <li><button id="theme-toggle-btn">Toggle Dark/Light Mode</button></li> -->
+                <div style="text-align: right; padding-right: 20px;">
+                    <label class="switch">
+                        <input type="checkbox" id="theme-toggle-btn">
+                        <span class="slider"></span>
+                    </label>
+                    <p id="toggle-text">Light Mode</p>
+                </div>
+                
+        <!-- </div> -->
+    </header>
+    <br/>
+    <div class="container">
+        <span style="padding-top: 30px; font-size: 20px;">Paste any Article Text or Link below to find out Real or Fake!</span>
+    </div>
+    <div class="container" style="padding-top: 30px;">
+        <label>
+            <textarea placeholder="Article Text" name="text" id="article-text" class="responsive-textarea" rows="10" cols="100" required></textarea>
+        </label>
+        
+        <div id="container">
+            <button type="button" class="predict-button" value="predict" id="predict-button-id">Predict</button>
+        </div>
+        <div id="container">
+            <div class="loader" id="loader-id" style="display: none;"></div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2 id="result-banner"></h2>
+    </div>
+
+
+<script>
+    document.getElementById("predict-button-id").addEventListener("click", function() {
+        
+        let loader = document.getElementById('loader-id');
+        let articleText = document.getElementById("article-text");
+        let resultBanner = document.getElementById("result-banner");
+
+        // start spinner and remove old prediction
+        console.log(loader);
+        loader.style.display = 'inline';
+        console.log(loader.style);
+        resultBanner.textContent = '';
+
+        let prediction = getPrediction(articleText.value);
+        
+        prediction.then(function (response) {
+            loader.style.display = 'none';
+            if (response === "real") {
+                articleText.style.border = "3px solid green";
+                resultBanner.style.color = "green";
+                resultBanner.textContent = "Real news!";
+            }
+            else if (response === "fake") {
+                articleText.style.border = "3px solid green";
+                resultBanner.style.color = "red";
+                resultBanner.textContent = "Fake news!";
+            }
+            else if (response === "lowtextsize") {
+                articleText.style.border = "3px solid green";
+                resultBanner.style.color = "red";
+                resultBanner.textContent = "Need minimum 300 words of article text for Prediction";
+            }
+            else {
+                articleText.style.border = "3px solid red";
+                resultBanner.style.color = "red";
+                resultBanner.textContent = "Unable to Fetch news from url, Provide text instead!";
+            }}, function (error) {
+                console.error("Prediction API call failed with error: " + error);
+            });
+}, false);
+
+document.addEventListener("DOMContentLoaded", function() {
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const body = document.body;
+    const toggleText = document.getElementById('toggle-text');
+
+    themeToggleBtn.addEventListener('change', function() {
+        if (themeToggleBtn.checked) {
+            body.classList.add('dark-mode');
+            toggleText.textContent = 'Dark Mode';
+        } else {
+            body.classList.remove('dark-mode');
+            toggleText.textContent = 'Light Mode';
+        }
+    });
+});
+
+
+</script>
+</body>
+</html>
